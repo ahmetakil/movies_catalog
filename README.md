@@ -1,7 +1,7 @@
 # movies_catalog
 
 A new Flutter project.
-This application is heavily influenced by this project here https://github.com/ahmetakil/movies_catalog 
+This application is heavily influenced by this project here https://github.com/bilguunint/movieapp
 
 ## To live demo:
 
