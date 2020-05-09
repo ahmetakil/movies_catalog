@@ -1,8 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_catalog/style/styles.dart';
+import 'package:universal_html/html.dart';
 
 class MoviePicker extends StatefulWidget {
+  final String name;
+  final String password;
+  final int vote;
+
+  const MoviePicker({Key key, this.name, this.password, this.vote})
+      : super(key: key);
+
   @override
   _MoviePickerState createState() => _MoviePickerState();
 }
@@ -11,16 +19,16 @@ class _MoviePickerState extends State<MoviePicker> {
   final _movieController = TextEditingController();
   bool _loading = false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  String name;
   String password;
+  String name;
+  int vote;
 
   @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments;
-    name = args["name"];
-    password = args["password"];
+  void initState() {
+    super.initState();
+    name = widget.name;
+    password = widget.password;
+    vote = widget.vote;
   }
 
   @override
@@ -40,6 +48,12 @@ class _MoviePickerState extends State<MoviePicker> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: buildInputHeader(),
+            ),
+          ),
+          Container(
+            child: Text(
+              "Kalan Oy: ${vote}",
+              style: TextStyle(color: Colors.white),
             ),
           ),
           StreamBuilder<QuerySnapshot>(
@@ -69,12 +83,33 @@ class _MoviePickerState extends State<MoviePicker> {
     );
   }
 
-  Widget movieTile(movieData) {
+  Widget movieTile(DocumentSnapshot movieData) {
     return ListTile(
+      onTap: () async {
+        final firestore = Firestore.instance;
+        final DocumentSnapshot userData =
+            await firestore.collection("users").document("$password").get();
+        final currentVote = userData["vote"];
+
+        if (currentVote == null || currentVote < 1) {
+          return;
+        }
+
+        firestore.runTransaction((transaction) async {
+          DocumentSnapshot fresh = await transaction.get(movieData.reference);
+          await transaction
+              .update(fresh.reference, {'vote': fresh["vote"] + 1});
+          await transaction
+              .update(userData.reference, {'vote': userData["vote"] - 1});
+        });
+        setState(() {
+          vote = userData["vote"] - 1;
+        });
+      },
       leading: CircleAvatar(
         backgroundColor: Colors.blue,
         child: Text(
-          "0",
+          "${movieData["vote"] ?? 0}",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -155,7 +190,11 @@ class _MoviePickerState extends State<MoviePicker> {
                       });
                       final DocumentReference result = await Firestore.instance
                           .collection("movies")
-                          .add({'name': name, 'movie': _movieController.text});
+                          .add({
+                        'name': name,
+                        'movie': _movieController.text,
+                        'vote': 0
+                      });
                       setState(() {
                         _loading = false;
                       });

@@ -4,6 +4,8 @@ import 'package:movies_catalog/style/styles.dart';
 import 'package:movies_catalog/widgets/genres_list.dart';
 import 'package:movies_catalog/widgets/now_playing.dart';
 
+import 'movie_picker.dart';
+
 class HomePage extends StatelessWidget {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -83,13 +85,15 @@ class HomePage extends StatelessWidget {
                                             return;
                                           }
                                           final name = result.data["name"];
-                                          Navigator.of(context).pushNamed(
-                                              "movie_picker",
-                                              arguments: {
-                                                'name': name,
-                                                'password': password
-                                              });
-                                          print("name is $name");
+                                         Navigator.of(context).push(
+                                           MaterialPageRoute(
+                                             builder: (_) => MoviePicker(
+                                               name: name,
+                                               password: password,
+                                               vote: result.data["vote"]??-1,
+                                             )
+                                           )
+                                         );
                                         } catch (e) {
                                           _scaffoldKey.currentState
                                               .showSnackBar(SnackBar(
