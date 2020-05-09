@@ -19,7 +19,7 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height*0.35,
+      height: MediaQuery.of(context).size.height*0.4,
       child: StreamBuilder<MovieResponse>(
         stream: nowPlayingMoviesBloc.subject.stream,
         builder: (ctx, snapshot) {

@@ -73,7 +73,7 @@ class _GenresState extends State<Genres> with SingleTickerProviderStateMixin{
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 307.0,
+        height: 308,
         child: DefaultTabController(
           length: genres.length,
           child: Scaffold(
@@ -93,7 +93,7 @@ class _GenresState extends State<Genres> with SingleTickerProviderStateMixin{
                   tabs: genres.map((Genre genre) {
                     return Container(
                         padding: EdgeInsets.only(bottom: 15.0, top: 10.0),
-                        child: new Text(genre.name.toUpperCase(),
+                        child: Text(genre.name.toUpperCase(),
                             style: TextStyle(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,

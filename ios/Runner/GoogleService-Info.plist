@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>390472701085-rs0qa45shal3i4rhom2sd24atblr7dhr.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.390472701085-rs0qa45shal3i4rhom2sd24atblr7dhr</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCcfOoAuRCfBiUmjzlnfmIPXR4vLPPv8HI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>390472701085</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>me.ahmetakil.movie-picker</string>
+	<key>PROJECT_ID</key>
+	<string>movie-picker-f8eb1</string>
+	<key>STORAGE_BUCKET</key>
+	<string>movie-picker-f8eb1.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:390472701085:ios:dd4a11254f96f1a0257074</string>
+	<key>DATABASE_URL</key>
+	<string>https://movie-picker-f8eb1.firebaseio.com</string>
+</dict>
+</plist>
