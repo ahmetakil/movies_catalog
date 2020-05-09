@@ -8,10 +8,20 @@ class MoviePicker extends StatefulWidget {
 }
 
 class _MoviePickerState extends State<MoviePicker> {
-  final _nameController = TextEditingController();
   final _movieController = TextEditingController();
   bool _loading = false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String name;
+  String password;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments;
+    name = args["name"];
+    password = args["password"];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +30,7 @@ class _MoviePickerState extends State<MoviePicker> {
       backgroundColor: Styles.BACKGROUND_COLOR,
       appBar: AppBar(
         backgroundColor: Styles.BACKGROUND_COLOR,
-        title: Text("Movie Picker"),
+        title: Text("Movie Picker - ${name}"),
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),
@@ -33,7 +43,8 @@ class _MoviePickerState extends State<MoviePicker> {
             ),
           ),
           StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection("movies").limit(10).snapshots(),
+            stream:
+                Firestore.instance.collection("movies").limit(10).snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text(snapshot.error);
@@ -67,9 +78,10 @@ class _MoviePickerState extends State<MoviePicker> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      subtitle: Text("Suggested by ${movieData["name"]}",style: TextStyle(
-        color: Colors.grey
-      ),),
+      subtitle: Text(
+        "Suggested by ${movieData["name"]}",
+        style: TextStyle(color: Colors.grey),
+      ),
       title: RichText(
         text: TextSpan(
           text: "Movie: ",
@@ -92,34 +104,9 @@ class _MoviePickerState extends State<MoviePicker> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-          flex: 6,
-          child: Container(
-            width: 200,
-            height: 80,
-            child: TextField(
-              controller: _nameController,
-              style: TextStyle(
-                color: Colors.black,
-              ),
-              maxLines: 1,
-              maxLength: 20,
-              decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.white),
-                labelText: "Name",
-                fillColor: Colors.white,
-                filled: true,
-                contentPadding: EdgeInsets.all(8),
-              ),
-            ),
-          ),
-        ),
-        Spacer(
-          flex: 1,
-        ),
-        Flexible(
           flex: 8,
           child: Container(
-            width: 200,
+            width: MediaQuery.of(context).size.width * 0.5,
             height: 80,
             child: TextField(
               controller: _movieController,
@@ -149,11 +136,14 @@ class _MoviePickerState extends State<MoviePicker> {
                   height: 20,
                   child: CircularProgressIndicator(),
                 )
-              : IconButton(
+              : FlatButton.icon(
+                  label: Text(
+                    "ADD",
+                    style: TextStyle(color: Colors.amber),
+                  ),
                   onPressed: () async {
                     try {
-                      if (!isInputValid(
-                          _nameController.text, _movieController.text)) {
+                      if (!isInputValid(_movieController.text)) {
                         _scaffoldKey.currentState.showSnackBar(SnackBar(
                           content: Text("Invalid Input !"),
                           duration: Duration(seconds: 2),
@@ -165,14 +155,10 @@ class _MoviePickerState extends State<MoviePicker> {
                       });
                       final DocumentReference result = await Firestore.instance
                           .collection("movies")
-                          .add({
-                        'name': _nameController.text,
-                        'movie': _movieController.text
-                      });
+                          .add({'name': name, 'movie': _movieController.text});
                       setState(() {
                         _loading = false;
                       });
-                      _nameController.clear();
                       _movieController.clear();
                     } catch (e) {
                       print(e);
@@ -189,8 +175,8 @@ class _MoviePickerState extends State<MoviePicker> {
     );
   }
 
-  bool isInputValid(String name, String movie) {
-    if (name.isEmpty || movie.isEmpty) {
+  bool isInputValid(String movie) {
+    if (movie.isEmpty) {
       print("returned false");
       return false;
     }
