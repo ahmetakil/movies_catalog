@@ -6,10 +6,8 @@ import 'package:universal_html/html.dart';
 class MoviePicker extends StatefulWidget {
   final String name;
   final String password;
-  final int vote;
 
-  const MoviePicker({Key key, this.name, this.password, this.vote})
-      : super(key: key);
+  const MoviePicker({Key key, this.name, this.password}) : super(key: key);
 
   @override
   _MoviePickerState createState() => _MoviePickerState();
@@ -21,14 +19,22 @@ class _MoviePickerState extends State<MoviePicker> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String password;
   String name;
-  int vote;
+  int initialVote = -99;
+  bool _voteLoading = false;
 
   @override
   void initState() {
     super.initState();
     name = widget.name;
     password = widget.password;
-    vote = widget.vote;
+    Firestore.instance
+        .document("users/$password")
+        .get()
+        .then((DocumentSnapshot doc) {
+      setState(() {
+        initialVote = doc["vote"];
+      });
+    });
   }
 
   @override
@@ -52,13 +58,13 @@ class _MoviePickerState extends State<MoviePicker> {
           ),
           Container(
             child: Text(
-              "Kalan Oy: ${vote}",
-              style: TextStyle(color: Colors.white),
+              "Kalan Oy: ${initialVote}",
+              style: TextStyle(color: Colors.white,fontSize: 20),
             ),
           ),
           StreamBuilder<QuerySnapshot>(
             stream:
-                Firestore.instance.collection("movies").limit(10).snapshots(),
+                Firestore.instance.collection("movies").limit(100).snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text(snapshot.error);
@@ -85,13 +91,20 @@ class _MoviePickerState extends State<MoviePicker> {
 
   Widget movieTile(DocumentSnapshot movieData) {
     return ListTile(
-      onTap: () async {
+      onTap: _voteLoading ?  null : () async {
+        setState(() {
+          _voteLoading = true;
+        });
         final firestore = Firestore.instance;
         final DocumentSnapshot userData =
             await firestore.collection("users").document("$password").get();
+
         final currentVote = userData["vote"];
 
-        if (currentVote == null || currentVote < 1) {
+        if (currentVote == null || currentVote < 1 || initialVote < 1) {
+          setState(() {
+            _voteLoading = false;
+          });
           return;
         }
 
@@ -100,15 +113,17 @@ class _MoviePickerState extends State<MoviePicker> {
           await transaction
               .update(fresh.reference, {'vote': fresh["vote"] + 1});
           await transaction
-              .update(userData.reference, {'vote': userData["vote"] - 1});
+              .update(userData.reference, {'vote': initialVote});
         });
         setState(() {
-          vote = userData["vote"] - 1;
+          initialVote--;
+          _voteLoading = false;
         });
+
       },
       leading: CircleAvatar(
         backgroundColor: Colors.blue,
-        child: Text(
+        child:  Text(
           "${movieData["vote"] ?? 0}",
           style: TextStyle(color: Colors.white),
         ),

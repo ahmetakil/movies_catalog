@@ -90,7 +90,6 @@ class HomePage extends StatelessWidget {
                                              builder: (_) => MoviePicker(
                                                name: name,
                                                password: password,
-                                               vote: result.data["vote"]??-1,
                                              )
                                            )
                                          );
